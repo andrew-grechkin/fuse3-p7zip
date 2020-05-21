@@ -1,0 +1,13 @@
+; vim: filetype=dosini
+
+[GenericValidator / ClangFromat]
+cmd    = clang-format
+select = {include,src}/**/*.{c,cpp,h,hpp}
+;ignore = {.build,3rdparty}/**/*
+argv   = --style=file
+
+[GenericTransformer / ClangFromat]
+cmd    = clang-format
+select = {include,src}/**/*.{c,cpp,h,hpp}
+;ignore = {.build,3rdparty}/**/*
+argv   = --style=file

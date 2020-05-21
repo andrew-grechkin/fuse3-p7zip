@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+
+use v5.22;
+use strict;
+use warnings;
+
+use Code::TidyAll::Git::Precommit;
+
+Code::TidyAll::Git::Precommit->check();

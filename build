@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+BUILD_TYPE=${BUILD_TYPE:-Debug}
+DIR=".build-$BUILD_TYPE"
+
+mkdir -p "$DIR" && pushd "$DIR"
+cmake -DCMAKE_BUILD_TYPE="$BUILD_TYPE" ..
+popd
+
+make -j -C "$DIR" install

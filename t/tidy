@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+cp -f "$(git rev-parse --show-toplevel)/.clang-format" /tmp
+
+tidyall -a -j 4
