@@ -1,3 +1,4 @@
 .build-*
 .tidyall.d
 include/version.hpp
+packaging/arch/fuse3-p7zip*
