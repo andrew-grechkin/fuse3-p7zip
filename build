@@ -5,8 +5,6 @@ set -Eeuo pipefail
 BUILD_TYPE=${BUILD_TYPE:-Debug}
 DIR=".build-$BUILD_TYPE"
 
-mkdir -p "$DIR" && pushd "$DIR"
-cmake -DCMAKE_BUILD_TYPE="$BUILD_TYPE" ..
-popd
-
+cmake -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -S . -B "$DIR"
+#cmake --build "$DIR" --target install
 make -j -C "$DIR" install
