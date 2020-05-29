@@ -1,6 +1,7 @@
 ﻿#include "7zip-impl.hpp"
 #include "exception.hpp"
 #include "string.hpp"
+#include "logger.hpp"
 
 #include <fcntl.h>
 
@@ -32,6 +33,7 @@ namespace sevenzip {
 			auto res = _arc->Open(_stream, &max_check_size, static_cast<IArchiveOpenCallback*>(this));
 			if (res == S_OK) {
 				_format = it;
+				log().printf("selected format: %s", it->name().c_str());
 				return;
 			}
 		}

@@ -2,6 +2,7 @@
 #include "exception.hpp"
 #include "string.hpp"
 
+#include <algorithm>
 #include <cstring>
 
 namespace sevenzip {
@@ -76,6 +77,28 @@ namespace sevenzip {
 
 		for (size_t idx = 0; idx < num_formats; ++idx) {
 			m_formats.emplace_back(std::make_shared<ImplFormat>(*this, idx));
+		}
+
+		auto override_formats_order = std::getenv("FUSE3_P7ZIP_FORMATS");
+		if (override_formats_order) {
+			auto formats = split(":", override_formats_order);
+
+			Formats head, tail, *current = &head;
+			for (auto& it : formats) {
+				if (it == "*") {
+					current = &tail;
+					continue;
+				}
+				// there are ~40 formats so let's not bother with binary search here
+				auto f =
+					std::find_if(m_formats.begin(), m_formats.end(), [it](const auto& i) { return i->name() == it; });
+				if (f != m_formats.end()) {
+					current->emplace_back(*f);
+					m_formats.erase(f);
+				}
+			}
+			m_formats.insert(m_formats.begin(), head.begin(), head.end());
+			m_formats.insert(m_formats.end(), tail.begin(), tail.end());
 		}
 	}
 } // namespace sevenzip

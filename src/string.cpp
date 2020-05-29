@@ -56,4 +56,19 @@ std::vector<std::string> split(const std::string& d, std::string str)
 	}
 	result.emplace_back(str);
 	return result;
+
+	// TODO use regex (if needed)
+	//auto re = std::regex(":+");
+
+	//auto formats = std::string(override_formats_order);
+	//auto it      = std::sregex_token_iterator(formats.begin(), formats.end(), re, -1);
+	//// Keep a dummy end iterator - Needed to construct a vector
+	//// using (start, end) iterators.
+	//sregex_token_iterator end;
+
+	//vector<string> vec(iter, end);
+
+	//for (auto a : vec) {
+	//cout << a << endl;
+	//}
 }

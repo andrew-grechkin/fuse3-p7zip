@@ -56,6 +56,18 @@ mount any archive supported by 7zip as a filesysterm mountpoint and have read on
 	folder) To prevent this situation you can set this environment variable to a maximum allowed file size. Attempts
 	opeining any file in archive bigger than this will end up in E2BIG error.
 
+* FUSE3_P7ZIP_FORMATS
+
+	When opening file application tries formats in alphabetical order. Sometimes it's desired to open file with format
+	later in the list. This environment variable allows to override formats order.
+
+	for example (try open .iso file with Iso or Udf formats first and only fallback on APM and GPT formats)
+	```
+	FUSE3_P7ZIP_FORMATS="Iso:Udf:*:APM:GPT" fuse3-p7zip ubuntu-20.04-desktop-amd64.iso /tmp/mnt
+	```
+
+	To check list of available formats run `7z i` command
+
 ## Author
 
 * Andrew Grechkin

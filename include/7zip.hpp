@@ -59,6 +59,15 @@ namespace sevenzip {
 		virtual const Extensions& additional_extension() const noexcept = 0;
 		virtual const Guid*       guid() const noexcept                 = 0;
 		virtual bool              updatable() const noexcept            = 0;
+
+		bool operator==(const std::string& rhs) const noexcept
+		{
+			return name() == rhs;
+		}
+		bool operator<(const std::string& rhs) const noexcept
+		{
+			return name() < rhs;
+		}
 	};
 
 	class IMethod {

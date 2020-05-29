@@ -36,7 +36,7 @@ namespace pattern {
 		}
 
 	private:
-		~Singleton() {}
+		~Singleton() = default;
 		Singleton() {}
 	};
 } // namespace pattern
