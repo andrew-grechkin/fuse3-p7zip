@@ -1,5 +1,6 @@
 ﻿#include "fuse3.hpp"
 #include "exception.hpp"
+#include "logger.hpp"
 #include "pattern.hpp"
 #include "string.hpp"
 #include "version.hpp"
@@ -209,6 +210,7 @@ ssize_t Fuse::execute(sevenzip::IArchive* arc)
 	root_stat.st_mode     = (root_stat.st_mode & ~S_IFMT) | S_IFDIR;
 	cache.tree.emplace(root, std::make_pair(arc->end(), root_stat));
 	for (auto it = arc->begin(); it != arc->end(); ++it) {
+		//log().printf("it: '%s'\n", it.path().c_str());
 		auto path = root / it.path();
 		auto name = sevenzip::Path(root == path && it.name().empty() ? arc->proposed_name() : it.name());
 		if (!it.extension().empty()) name += "." + it.extension();
@@ -223,7 +225,16 @@ ssize_t Fuse::execute(sevenzip::IArchive* arc)
 		} else {
 			file_stat.st_mode |= S_IFREG;
 		}
+		//log().printf("path: '%s'\n", path.c_str());
 		cache.tree.emplace(path, std::make_pair(it, file_stat));
+		for (auto p = path.parent_path(); !p.empty() && p != root; p = p.parent_path()) {
+			if (cache.tree.contains(p)) break;
+			//log().printf("sub: '%s'\n", p.c_str());
+			file_stat.st_size = it.size();
+			file_stat.st_mode &= ~S_IFMT;
+			file_stat.st_mode |= S_IFDIR;
+			cache.tree.emplace(p, std::make_pair(arc->end(), file_stat));
+		}
 	}
 
 	fuse = fuse_new(&_params->args, _operations.get(), sizeof(fuse_operations), &cache);

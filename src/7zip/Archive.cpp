@@ -233,7 +233,10 @@ namespace sevenzip {
 	{
 		NWindows::NCOM::CPropVariant prop;
 		auto                         res = impl->get_prop(kpidPath, prop);
-		//if (res == S_OK && prop.bstrVal) printf("prop bstr: '%ls'\n", (const wchar_t*)prop.bstrVal);
+		//log().printf("prop path: %d\n", res);
+		//std::setlocale(LC_ALL, "");
+		//if (res == S_OK && prop.bstrVal) log().printf("prop bstr (l): '%ls'\n", (const wchar_t*)prop.bstrVal);
+		//if (res == S_OK && prop.bstrVal) log().printf("prop bstr (u): '%s'\n", utf8((const wchar_t*)prop.bstrVal).c_str());
 		if (res == S_OK && prop.bstrVal) {
 			auto override_encoding = std::getenv("FUSE3_P7ZIP_FORCE_ENCODING");
 			return override_encoding ? utf8raw((const wchar_t*)prop.bstrVal, override_encoding)
