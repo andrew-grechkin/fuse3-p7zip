@@ -1,5 +1,6 @@
 ﻿#include "7zip-impl.hpp"
 #include "exception.hpp"
+#include "logger.hpp"
 
 namespace sevenzip {
 	ULONG WINAPI ImplArchiveExtractor::AddRef()
@@ -17,12 +18,15 @@ namespace sevenzip {
 		HRESULT ret = S_OK;
 
 		if (object && (riid == IID_IArchiveExtractCallback)) {
+			LogDebug("%s: IID_IArchiveExtractCallback", __PRETTY_FUNCTION__);
 			*object = static_cast<IArchiveExtractCallback*>(this);
 			AddRef();
 		} else if (object && (riid == IID_ICryptoGetTextPassword)) {
+			LogDebug("%s: IID_ICryptoGetTextPassword", __PRETTY_FUNCTION__);
 			*object = static_cast<ICryptoGetTextPassword*>(this);
 			AddRef();
 		} else {
+			LogDebug("%s: UnknownImp", __PRETTY_FUNCTION__);
 			ret = UnknownImp::QueryInterface(riid, object);
 		}
 		return ret;
@@ -39,6 +43,7 @@ namespace sevenzip {
 
 	HRESULT WINAPI ImplArchiveExtractor::SetTotal(UInt64 size)
 	{
+		LogDebug("%s: %d", __PRETTY_FUNCTION__, size);
 		total       = size;
 		HRESULT ret = callback.notify_progress(0, total) == true ? S_OK : S_FALSE;
 
@@ -47,6 +52,7 @@ namespace sevenzip {
 
 	HRESULT WINAPI ImplArchiveExtractor::SetCompleted(const UInt64* completeValue)
 	{
+		LogDebug("%s: %p", __PRETTY_FUNCTION__, completeValue);
 		HRESULT ret = S_OK;
 
 		if (completeValue) ret = callback.notify_progress(*completeValue, total) == true ? S_OK : S_FALSE;
@@ -56,6 +62,7 @@ namespace sevenzip {
 
 	HRESULT WINAPI ImplArchiveExtractor::GetStream(UInt32 index, ISequentialOutStream** outStream, Int32 askExtractMode)
 	{
+		LogDebug("%s: %d %d %p", __PRETTY_FUNCTION__, index, askExtractMode, file.get());
 		*outStream = nullptr;
 
 		//m_curr.reset(new CurrItem(askExtractMode, m_dest, arc.at(index)));
@@ -93,6 +100,7 @@ namespace sevenzip {
 
 	HRESULT WINAPI ImplArchiveExtractor::PrepareOperation(Int32 askExtractMode)
 	{
+		LogDebug("%s: %d", __PRETTY_FUNCTION__, askExtractMode);
 		switch (askExtractMode) {
 			case NArchive::NExtract::NAskMode::kExtract: break;
 			case NArchive::NExtract::NAskMode::kTest: break;
@@ -103,6 +111,7 @@ namespace sevenzip {
 
 	HRESULT WINAPI ImplArchiveExtractor::SetOperationResult(Int32 operationResult)
 	{
+		LogDebug("%s: %d", __PRETTY_FUNCTION__, operationResult);
 		if (operationResult != NArchive::NExtract::NOperationResult::kOK) {
 			//			failed_files.push_back(FailedFile(m_curr->item.path(), operationResult));
 		} else {
@@ -119,6 +128,7 @@ namespace sevenzip {
 
 	HRESULT WINAPI ImplArchiveExtractor::CryptoGetTextPassword(BSTR* pass)
 	{
+		LogDebug("%s: %p", __PRETTY_FUNCTION__, pass);
 		//ustring ret = callback.request_password();
 		//com::BStr(ret).detach(*pass);
 		return S_OK;
@@ -131,8 +141,10 @@ namespace sevenzip {
 		const UInt32 indices[] = {index};
 		file.reset(new FileWriteStream);
 		file->AddRef();
+		LogDebug("Extract: %d", index);
 		CheckCom(arc->Extract(indices, 1, test, static_cast<IArchiveExtractCallback*>(this)), "Extract");
 		file->seek(0, IFile::Whence::set);
+		LogDebug("Extract finished: %d", index);
 
 		return std::unique_ptr<IFile>(file.release());
 	}

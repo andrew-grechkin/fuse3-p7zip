@@ -28,7 +28,7 @@ namespace library {
 
 	ImplDynamic::ImplDynamic(const Path& path, flags_type flags)
 		: _path(path)
-		, _flags(flags | RTLD_NOW)
+		, _flags(flags | RTLD_NOW | RTLD_GLOBAL)
 		, _hnd(dlopen(path.c_str(), _flags))
 	{
 		CheckPointer(_hnd, ThrowLibraryError, "dlopen");

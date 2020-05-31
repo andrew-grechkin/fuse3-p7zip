@@ -136,6 +136,7 @@ int Fuse::Operations::cb_getattr(const char* path, struct stat* stbuf, fuse_file
 
 int Fuse::Operations::cb_open(const char* path, fuse_file_info* fi)
 {
+	LogDebug("fuse3 open: %s", path);
 	Cache* cache = static_cast<Cache*>(fuse_get_context()->private_data);
 	auto   el    = cache->tree.find(path);
 	if (el == cache->tree.end()) return -ENOENT;
@@ -148,6 +149,7 @@ int Fuse::Operations::cb_open(const char* path, fuse_file_info* fi)
 
 	auto tmpfile = el->second.first.extract().release();
 	fi->fh       = reinterpret_cast<uint64_t>(tmpfile);
+	LogDebug("fuse3 open fh: %p", fi->fh);
 
 	return 0;
 }
@@ -161,6 +163,7 @@ int Fuse::Operations::cb_release(const char*, struct fuse_file_info* fi)
 
 int Fuse::Operations::cb_read(const char* path, char* buf, size_t size, off_t offset, struct fuse_file_info* fi)
 {
+	LogDebug("fuse3 read: %s", path);
 	auto file = reinterpret_cast<sevenzip::IFile*>(fi->fh);
 	file->seek(offset, sevenzip::IFile::Whence::set);
 	return file->read(buf, size);
@@ -226,7 +229,7 @@ ssize_t Fuse::execute(sevenzip::IArchive* arc)
 			file_stat.st_mode |= S_IFREG;
 		}
 		//log().printf("path: '%s'\n", path.c_str());
-		cache.tree.emplace(path, std::make_pair(it, file_stat));
+		cache.tree.insert_or_assign(path, std::make_pair(it, file_stat));
 		for (auto p = path.parent_path(); !p.empty() && p != root; p = p.parent_path()) {
 			if (cache.tree.contains(p)) break;
 			//log().printf("sub: '%s'\n", p.c_str());

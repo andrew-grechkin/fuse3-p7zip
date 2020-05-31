@@ -58,8 +58,8 @@ mount any archive supported by 7zip as a filesysterm mountpoint and have read on
 
 * FUSE3_P7ZIP_FORMATS
 
-	When opening file application tries formats in alphabetical order. Sometimes it's desired to open file with format
-	later in the list. This environment variable allows to override formats order.
+	When opening a file application tries formats in alphabetical order. Sometimes it's desired to open a file with
+	format later in the list. This environment variable allows to override formats order.
 
 	for example (try open .iso file with Iso or Udf formats first and only fallback on APM and GPT formats)
 	```

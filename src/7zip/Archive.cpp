@@ -43,9 +43,11 @@ namespace sevenzip {
 	void ImplArchive::init_props()
 	{
 		CheckCom(_arc->GetNumberOfItems(&_size), "GetNumberOfItems");
+		LogDebug("GetNumberOfItems: %d", _size);
 
 		auto num_props = UInt32();
 		CheckCom(_arc->GetNumberOfArchiveProperties(&num_props), "GetNumberOfArchiveProperties");
+		LogDebug("GetNumberOfArchiveProperties: %d", num_props);
 	}
 
 	ULONG WINAPI ImplArchive::AddRef()
