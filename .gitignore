@@ -1,4 +1,6 @@
 .build-*
 .tidyall.d
+compile_commands.json
 include/version.hpp
 packaging/arch/fuse3-p7zip*
+tags

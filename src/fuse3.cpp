@@ -224,9 +224,9 @@ ssize_t Fuse::execute(sevenzip::IArchive* arc)
 		file_stat.st_mode &= ~S_IFMT;
 		file_stat.st_size = it.size();
 		if (it.is_dir()) {
-			file_stat.st_mode |= S_IFDIR;
+			file_stat.st_mode |= S_IFDIR | 0775;
 		} else {
-			file_stat.st_mode |= S_IFREG;
+			file_stat.st_mode |= S_IFREG | 0664;
 		}
 		//log().printf("path: '%s'\n", path.c_str());
 		cache.tree.insert_or_assign(path, std::make_pair(it, file_stat));
@@ -235,7 +235,7 @@ ssize_t Fuse::execute(sevenzip::IArchive* arc)
 			//log().printf("sub: '%s'\n", p.c_str());
 			file_stat.st_size = it.size();
 			file_stat.st_mode &= ~S_IFMT;
-			file_stat.st_mode |= S_IFDIR;
+			file_stat.st_mode |= S_IFDIR | 0775;
 			cache.tree.emplace(p, std::make_pair(arc->end(), file_stat));
 		}
 	}
