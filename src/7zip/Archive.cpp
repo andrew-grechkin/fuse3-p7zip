@@ -8,6 +8,15 @@
 namespace sevenzip {
 	const UInt64 max_check_size = 100 * 1024 * 1024;
 
+	Time _to_time(const FILETIME& ft)
+	{
+		uint64_t date   = *(reinterpret_cast<const uint64_t*>(&ft));
+		uint64_t adjust = 11644473600000 * 10000;
+		date -= adjust;
+
+		return Time{static_cast<decltype(Time::tv_sec)>(date / 10000000), static_cast<decltype(Time::tv_nsec)>(date)};
+	}
+
 	ImplArchive::~ImplArchive() noexcept
 	{
 		_arc->Close();
@@ -286,6 +295,33 @@ namespace sevenzip {
 		auto                         res = impl->get_prop(kpidPackSize, prop);
 		if (res == S_OK && prop.vt == 21) return prop.uhVal.QuadPart;
 		return 0;
+	}
+
+	Time ImplArchive::ci_iterator::atime() const
+	{
+		NWindows::NCOM::CPropVariant prop;
+		auto                         res = impl->get_prop(kpidATime, prop);
+		if (res == S_OK && prop.vt == VT_FILETIME && (prop.filetime.dwLowDateTime || prop.filetime.dwHighDateTime))
+			return _to_time(prop.filetime);
+		return Time{0, 0};
+	}
+
+	Time ImplArchive::ci_iterator::mtime() const
+	{
+		NWindows::NCOM::CPropVariant prop;
+		auto                         res = impl->get_prop(kpidMTime, prop);
+		if (res == S_OK && prop.vt == VT_FILETIME && (prop.filetime.dwLowDateTime || prop.filetime.dwHighDateTime))
+			return _to_time(prop.filetime);
+		return Time{0, 0};
+	}
+
+	Time ImplArchive::ci_iterator::ctime() const
+	{
+		NWindows::NCOM::CPropVariant prop;
+		auto                         res = impl->get_prop(kpidCTime, prop);
+		if (res == S_OK && prop.vt == VT_FILETIME && (prop.filetime.dwLowDateTime || prop.filetime.dwHighDateTime))
+			return _to_time(prop.filetime);
+		return Time{0, 0};
 	}
 
 	bool ImplArchive::ci_iterator::is_file() const

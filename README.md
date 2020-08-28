@@ -13,6 +13,8 @@ $ fusermount -u /tmp/mnt
 ```
 ## Description
 
+https://github.com/andrew-grechkin/fuse3-p7zip
+
 This application is an implementation of Filesystem in Userspace (FUSE) version 3 backed by 7zip library. It's able to
 mount any archive supported by 7zip as a filesysterm mountpoint and have read only access to any file in this archive.
 

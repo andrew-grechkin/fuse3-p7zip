@@ -120,6 +120,7 @@ void* Fuse::Operations::cb_init(fuse_conn_info*, fuse_config* cfg)
 
 	return ctx->private_data;
 }
+
 void Fuse::Operations::cb_destroy(void*) {}
 
 int Fuse::Operations::cb_getattr(const char* path, struct stat* stbuf, fuse_file_info*)
@@ -223,6 +224,10 @@ ssize_t Fuse::execute(sevenzip::IArchive* arc)
 		auto file_stat = arc->stat();
 		file_stat.st_mode &= ~S_IFMT;
 		file_stat.st_size = it.size();
+		file_stat.st_atim = it.atime();
+		file_stat.st_mtim = it.mtime();
+		file_stat.st_ctim = it.ctime();
+
 		if (it.is_dir()) {
 			file_stat.st_mode |= S_IFDIR | 0775;
 		} else {

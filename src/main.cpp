@@ -3,9 +3,6 @@
 #include "fuse3.hpp"
 #include "logger.hpp"
 
-// TODO
-// verbose --version
-
 int main(int argc, char** argv, char** env)
 try {
 	auto override_library = std::getenv("FUSE3_P7ZIP_LIBRARY");

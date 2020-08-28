@@ -83,7 +83,7 @@ namespace sevenzip {
 	{
 		LogTrace();
 		auto pos = std::ftell(_file);
-		ftruncate(_file->_fileno, newSize);
+		CheckResult(ftruncate(_file->_fileno, newSize) == 0, "ftruncate");
 		std::fseek(_file, pos, SEEK_SET);
 		LogDebug("SetSize: %d", newSize);
 		return check_error(_file);

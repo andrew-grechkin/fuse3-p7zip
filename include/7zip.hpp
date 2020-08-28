@@ -25,6 +25,7 @@ namespace sevenzip {
 	struct Guid;
 
 	using Stat       = struct stat;
+	using Time       = struct timespec;
 	using Path       = std::filesystem::path;
 	using Lib        = std::unique_ptr<ILib>;
 	using Format     = std::shared_ptr<IFormat>;
@@ -159,6 +160,9 @@ namespace sevenzip {
 		std::string comment() const;
 		Size        size() const;
 		Size        size_packed() const;
+		Time        atime() const;
+		Time        mtime() const;
+		Time        ctime() const;
 
 		bool is_file() const;
 		bool is_dir() const;
