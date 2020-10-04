@@ -57,7 +57,10 @@ add_executable             ("${PROJECT_NAME}"
 	3rdparty/p7zip/CPP/Windows/PropVariant.cpp
 )
 
-set_target_properties      ("${PROJECT_NAME}" PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+if ("${CMAKE_BUILD_TYPE}" MATCHES "Release")
+	set_target_properties  ("${PROJECT_NAME}" PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
 # set_target_properties      ("${PROJECT_NAME}" PROPERTIES LINKER_LANGUAGE CXX)
 
 target_compile_features    ("${PROJECT_NAME}" PUBLIC
@@ -73,15 +76,15 @@ target_compile_options     ("${PROJECT_NAME}" PRIVATE
 	#-Wextra
 )
 target_include_directories ("${PROJECT_NAME}" PRIVATE
+	include
+)
+target_include_directories ("${PROJECT_NAME}" PRIVATE
 	src/include
 	"${FUSE3_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_LIST_DIR}/3rdparty/p7zip"
 	"${CMAKE_CURRENT_LIST_DIR}/3rdparty/p7zip/CPP"
 	"${CMAKE_CURRENT_LIST_DIR}/3rdparty/p7zip/CPP/include_windows"
 	"${CMAKE_CURRENT_LIST_DIR}/3rdparty/p7zip/CPP/myWindows"
-)
-target_include_directories ("${PROJECT_NAME}" PRIVATE
-	include
 )
 target_link_libraries      ("${PROJECT_NAME}" PRIVATE
 	"${CMAKE_DL_LIBS}"

@@ -1,5 +1,7 @@
 # fuse3-p7zip
 
+[![Build status](https://github.com/andrew-grechkin/fuse3-p7zip/workflows/CMake/badge.svg)](https://github.com/andrew-grechkin/fuse3-p7zip/actions)
+
 ## Abstract
 
 fuse3 file system that uses the p7zip library to mount archives (read only)
