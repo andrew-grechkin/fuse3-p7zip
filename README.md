@@ -18,7 +18,7 @@ $ fusermount -u /tmp/mnt
 https://github.com/andrew-grechkin/fuse3-p7zip
 
 This application is an implementation of Filesystem in Userspace (FUSE) version 3 backed by 7zip library. It's able to
-mount any archive supported by 7zip as a filesysterm mountpoint and have read only access to any file in this archive.
+mount any archive supported by 7zip as a filesystem mountpoint and have read only access to any file in this archive.
 
 ## Dependencies
 
@@ -71,6 +71,23 @@ mount any archive supported by 7zip as a filesysterm mountpoint and have read on
 	```
 
 	To check list of available formats run `7z i` command
+
+## Examples
+
+### vifm config snippet (mount 7zip supported archive with fuse3-p7zip in vifm)
+
+```vim
+filetype *.7z,*.zip,
+	\*.dsl.dz,*.tar,*.a,*.so,lib*.so.*,*.zip,*.ova,*.sfs,
+	\*.apk,*.apm,*.ar,*.arj,*.cab,*.chm,*.cpio,*.cramfs,*.deb,*.dll,*.dmg,*.doc,*.esd,*.exe,
+	\*.flv,*.hxs,*.img,*.iso,*.iso,*.jar,*.lib,*.macho,*.msi,*.msp,*.nsis,*.pkg,*.pmd,*.ppt,
+	\*.qcow,*.qcow2,*.qcow2c,*.r00,*.rar,*.raw,*.rpm,*.squashfs,*.swf,*.swm,*.sys,*.vdi,*.vhd,*.vmdk,*.wim,*.xar,*.xls,
+	\*.tar.bz2,*.tbz2,*.tbz,*.tz2,*.tar.gz,*.tgz,*.taz,*.tar.lz,*.tlzip,*.tar.lzma,*.tlzma,*.tlz,
+	\*.tar.lzop,*.tlzo,*.tlzop,*.tar.xz,*.txz,*.tar.zst,*.tzst,*.tar.Z,*.taZ,
+	\*.bz2,*.gz,*.lz,*.lzma,*.lzop,*.xz,*.zst,*.Z
+	\ {Mount with fuse3-p7zip}
+	\ FUSE_MOUNT|fuse3-p7zip %SOURCE_FILE %DESTINATION_DIR,
+```
 
 ## Author
 
