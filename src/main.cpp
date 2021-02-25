@@ -2,6 +2,8 @@
 #include "library.hpp"
 #include "fuse3.hpp"
 #include "logger.hpp"
+#include <stdlib.h>
+#include <regex>
 
 int main(int argc, char** argv, char** env)
 try {
@@ -18,6 +20,16 @@ try {
 	auto lib = sevenzip::open(lib_path);
 
 	Fuse loop(argc, argv);
+
+	// detect codepage if *.cp866.zip
+	std::smatch match;
+	if (std::regex_search(loop.path(), match, std::regex("\\.(cp\\d{3,})\\.", std::regex_constants::icase))) {
+		if (match.size() == 2) {
+			log().printf("detected encoding: %s", match[1].str().c_str());
+			setenv("FUSE3_P7ZIP_FORCE_ENCODING", match[1].str().c_str(), 0);
+		}
+	}
+
 	log().printf("open archive: %s", loop.path().c_str());
 	auto arc = lib->open(loop.path(), sevenzip::EmptyOpenCallback());
 

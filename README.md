@@ -13,6 +13,7 @@ $ fuse3-p7zip archive.7z /tmp/mnt
 $ ls -la /tmp/mnt
 $ fusermount -u /tmp/mnt
 ```
+
 ## Description
 
 https://github.com/andrew-grechkin/fuse3-p7zip
@@ -26,6 +27,11 @@ mount any archive supported by 7zip as a filesystem mountpoint and have read onl
 * fuse3
 * p7zip
 
+## Enforcing codepage by renaming archive
+
+If archive name matches `m/[.] cp\d{3,} [.]/ix` (for example `cyrillic-created-on-windows.cp866.zip`) then matched
+encoding `cp866` will be enforced for listing archived files/directories.
+
 ## Configuration
 
 ### Environment variables
@@ -36,7 +42,7 @@ mount any archive supported by 7zip as a filesystem mountpoint and have read onl
 
 * FUSE3_P7ZIP_FORCE_ENCODING
 
-	Some archives (especially those ones created on windows) have file names encoded in non-unicode encoding. This
+	Some archives (especially those ones created on windows) have file names encoded in non Unicode encoding. This
 	environment variable forces application to use alternative encoding to decode file names.
 
 	for example:
@@ -56,9 +62,9 @@ mount any archive supported by 7zip as a filesystem mountpoint and have read onl
 
 	The nature of 7z API does not allow to have random access to the content of a file in archive. This means that each
 	file should be extracted to a temporary folder on access. If this file is too big (for example it's partition in an
-	.img file - application will extract the whole partition to /tmp. Most of the time on modern linux it's a RAM based
+	.img file - application will extract the whole partition to /tmp. Most of the time on modern Linux it's a RAM based
 	folder) To prevent this situation you can set this environment variable to a maximum allowed file size. Attempts
-	opeining any file in archive bigger than this will end up in E2BIG error.
+	openining any file in archive bigger than this will end up in E2BIG error.
 
 * FUSE3_P7ZIP_FORMATS
 
