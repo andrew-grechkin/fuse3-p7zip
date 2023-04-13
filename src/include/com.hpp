@@ -1,4 +1,4 @@
-﻿#ifndef __FUSE3_7Z__COM_HPP_
+#ifndef __FUSE3_7Z__COM_HPP_
 #define __FUSE3_7Z__COM_HPP_
 
 #include <atomic>

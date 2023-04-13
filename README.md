@@ -34,11 +34,21 @@ encoding `cp866` will be enforced for listing archived files/directories.
 
 ## Configuration
 
+### Command line options
+
+* -p <PASSWORD>
+
+	Provide a password which will be used if archive is protected with a password.
+
 ### Environment variables
 
 * FUSE3_P7ZIP_LIBRARY
 
 	Change where application searches for 7z.so library. By default this is `/usr/lib/p7zip/7z.so`
+
+* FUSE3_P7ZIP_PASSWORD
+
+	Provide a password which will be used if archive is protected with a password.
 
 * FUSE3_P7ZIP_FORCE_ENCODING
 
@@ -68,22 +78,22 @@ encoding `cp866` will be enforced for listing archived files/directories.
 
 * FUSE3_P7ZIP_FORMATS
 
-	When opening a file application tries formats in alphabetical order. Sometimes it's desired to open a file with
-	format later in the list. This environment variable allows to override formats order.
+	When opening a file application tries all formats in the alphabetical order. Sometimes it's desired to open a file
+	with a format later in the list. This environment variable allows to override formats order.
 
 	for example (try open .iso file with Iso or Udf formats first and only fallback on APM and GPT formats)
 	```
 	FUSE3_P7ZIP_FORMATS="Iso:Udf:*:APM:GPT" fuse3-p7zip ubuntu-20.04-desktop-amd64.iso /tmp/mnt
 	```
 
-	To check list of available formats run `7z i` command
+	To check the list of all available formats run `7z i` command
 
 ## Examples
 
 ### vifm config snippet (mount 7zip supported archive with fuse3-p7zip in vifm)
 
 ```vim
-filetype *.7z,*.zip,
+filetype *.7z,
 	\*.dsl.dz,*.tar,*.a,*.so,lib*.so.*,*.zip,*.ova,*.sfs,
 	\*.apk,*.apm,*.ar,*.arj,*.cab,*.chm,*.cpio,*.cramfs,*.deb,*.dll,*.dmg,*.doc,*.esd,*.exe,
 	\*.flv,*.hxs,*.img,*.iso,*.iso,*.jar,*.lib,*.macho,*.msi,*.msp,*.nsis,*.pkg,*.pmd,*.ppt,

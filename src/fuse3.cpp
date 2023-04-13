@@ -1,4 +1,4 @@
-﻿#include "fuse3.hpp"
+#include "fuse3.hpp"
 #include "exception.hpp"
 #include "logger.hpp"
 #include "pattern.hpp"
@@ -11,7 +11,10 @@
 #include <memory>
 #include <vector>
 
-static const fuse_opt opts_spec[] = {FUSE_OPT_END};
+#define CMD_OPT(t, m)                                                                                                  \
+	{                                                                                                                  \
+		t, offsetof(struct cmd_params_t, m), 1                                                                         \
+	}
 
 enum arg_status : int {
 	ARG_DISCARD = 0,
@@ -21,9 +24,17 @@ enum arg_status : int {
 
 struct Cache {
 	using FileTree = std::map<sevenzip::Path, std::pair<sevenzip::IArchive::ci_iterator, sevenzip::Stat>>;
-	sevenzip::IArchive* arc;
-	FileTree            tree;
+	sevenzip::IArchive*       arc;
+	sevenzip::ExtractCallback ecb;
+	FileTree                  tree;
 };
+
+static struct cmd_params_t {
+	char*                    password = nullptr;
+	std::vector<std::string> cli_args;
+} cmd_params;
+
+static const fuse_opt opts_spec[] = {CMD_OPT("--password=%s", password), CMD_OPT("-p %s", password), FUSE_OPT_END};
 
 class Fuse::Params: public fuse_cmdline_opts {
 public:
@@ -33,13 +44,13 @@ public:
 	void       print_usage();
 	static int process_arg(Params* fuse, const char* arg, int key, struct fuse_args* outargs);
 
-	fuse_args                args;
-	std::vector<std::string> cli_args;
+	fuse_args args;
 };
 
 Fuse::Params::~Params()
 {
 	free(mountpoint);
+	fuse_opt_free_args(&args);
 }
 
 Fuse::Params::Params(int argc, char** argv)
@@ -47,9 +58,16 @@ Fuse::Params::Params(int argc, char** argv)
 	mountpoint = nullptr;
 	args       = FUSE_ARGS_INIT(argc, argv);
 
-	CheckResult(fuse_opt_parse(&args, this, opts_spec, (fuse_opt_proc_t)&process_arg) != -1, "fuse_opt_parse");
+	CheckResult(fuse_opt_parse(&args, &cmd_params, opts_spec, (fuse_opt_proc_t)&process_arg) != -1, "fuse_opt_parse");
 
 	CheckResult(fuse_parse_cmdline(&args, this) == 0, "fuse_parse_cmdline");
+
+	if (!cmd_params.password) {
+		auto password = std::getenv("FUSE3_P7ZIP_PASSWORD");
+		if (password) {
+			cmd_params.password = password;
+		}
+	}
 
 	if (show_version) {
 		printf("%s\n", PROJECT_VERSION);
@@ -58,6 +76,9 @@ Fuse::Params::Params(int argc, char** argv)
 		exit(0);
 	} else if (show_help) {
 		print_usage();
+	} else if (cmd_params.cli_args.empty()) {
+		fprintf(stderr, "error: no archive specified\n");
+		exit(0);
 	} else if (!mountpoint) {
 		fprintf(stderr, "error: no mountpoint specified\n");
 		exit(0);
@@ -67,6 +88,8 @@ Fuse::Params::Params(int argc, char** argv)
 void Fuse::Params::print_usage()
 {
 	printf("usage: fuse3-7z [options] <archive> <mountpoint>\n\n");
+	printf("Options:\n");
+	printf("    -p <password>          provide password for protected archives\n");
 	fuse_cmdline_help();
 	fuse_lib_help(&args);
 	exit(0);
@@ -74,11 +97,12 @@ void Fuse::Params::print_usage()
 
 int Fuse::Params::process_arg(Fuse::Params* fuse, const char* arg, int key, struct fuse_args* outargs)
 {
+	// printf("key: %d, arg: %s\n", key, arg);
 	switch (key) {
 		case FUSE_OPT_KEY_NONOPT:
-			fuse->cli_args.emplace_back(arg);
-			if (fuse->cli_args.back().empty()) fuse->print_usage();
-			if (fuse->cli_args.size() == 1) return ARG_DISCARD;
+			cmd_params.cli_args.emplace_back(arg);
+			if (cmd_params.cli_args.back().empty()) fuse->print_usage();
+			if (cmd_params.cli_args.size() == 1) return ARG_DISCARD;
 
 		default: return ARG_KEEP;
 	}
@@ -148,7 +172,7 @@ int Fuse::Operations::cb_open(const char* path, fuse_file_info* fi)
 		if (el->second.second.st_size > size) return -E2BIG;
 	}
 
-	auto tmpfile = el->second.first.extract().release();
+	auto tmpfile = el->second.first.extract(cache->ecb).release();
 	fi->fh       = reinterpret_cast<uint64_t>(tmpfile);
 	LogDebug("fuse3 open fh: %p", fi->fh);
 
@@ -203,12 +227,20 @@ Fuse::Fuse(int argc, char** argv)
 
 const std::string& Fuse::path() const
 {
-	return _params->cli_args[0];
+	return cmd_params.cli_args[0];
+}
+
+std::string Fuse::password() const
+{
+	if (cmd_params.password) {
+		return std::string(cmd_params.password);
+	}
+	return std::string();
 }
 
 ssize_t Fuse::execute(sevenzip::IArchive* arc)
 {
-	static auto cache     = Cache{arc, Cache::FileTree()};
+	static auto cache     = Cache{arc, sevenzip::ExtractCallback(password()), Cache::FileTree()};
 	auto        root      = sevenzip::Path("/");
 	auto        root_stat = arc->stat();
 	root_stat.st_mode     = (root_stat.st_mode & ~S_IFMT) | S_IFDIR;

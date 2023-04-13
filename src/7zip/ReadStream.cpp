@@ -2,8 +2,7 @@
 #include "exception.hpp"
 
 namespace sevenzip {
-	class FileReadStream::FileHandle: public std::FILE {
-	};
+	class FileReadStream::FileHandle: public std::FILE {};
 
 	HRESULT check_error(FileReadStream::FileHandle* file)
 	{
