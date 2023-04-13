@@ -1,6 +1,7 @@
-﻿#include "7zip-impl.hpp"
+#include "7zip-impl.hpp"
 #include "exception.hpp"
 #include "logger.hpp"
+#include "string.hpp"
 
 namespace sevenzip {
 	ULONG WINAPI ImplArchiveExtractor::AddRef()
@@ -52,7 +53,7 @@ namespace sevenzip {
 
 	HRESULT WINAPI ImplArchiveExtractor::SetCompleted(const UInt64* completeValue)
 	{
-		LogDebug("%s: %p", __PRETTY_FUNCTION__, completeValue);
+		LogDebug("%s: %p %llu", __PRETTY_FUNCTION__, completeValue, *completeValue);
 		HRESULT ret = S_OK;
 
 		if (completeValue) ret = callback.notify_progress(*completeValue, total) == true ? S_OK : S_FALSE;
@@ -128,9 +129,8 @@ namespace sevenzip {
 
 	HRESULT WINAPI ImplArchiveExtractor::CryptoGetTextPassword(BSTR* pass)
 	{
-		LogDebug("%s: %p", __PRETTY_FUNCTION__, pass);
-		//ustring ret = callback.request_password();
-		//com::BStr(ret).detach(*pass);
+		LogDebug("%s %p", __PRETTY_FUNCTION__, pass);
+		*pass = SysAllocString(wide_str(callback.request_password().c_str()).c_str());
 		return S_OK;
 	}
 

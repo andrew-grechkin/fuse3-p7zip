@@ -3,8 +3,7 @@
 #include "logger.hpp"
 
 namespace sevenzip {
-	class FileWriteStream::FileHandle: public std::FILE {
-	};
+	class FileWriteStream::FileHandle: public std::FILE {};
 
 	HRESULT check_error(FileWriteStream::FileHandle* file)
 	{

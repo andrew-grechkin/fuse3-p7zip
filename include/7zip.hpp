@@ -1,4 +1,4 @@
-﻿#ifndef __FUSE3_7Z__7ZIP_HPP_
+#ifndef __FUSE3_7Z__7ZIP_HPP_
 #define __FUSE3_7Z__7ZIP_HPP_
 
 #include <filesystem>
@@ -90,22 +90,39 @@ namespace sevenzip {
 		virtual bool notify_progress(uint64_t current, uint64_t of) const = 0;
 	};
 
-	class EmptyOpenCallback: public IOpenCallback {
+	class OpenCallback: public IOpenCallback {
+	public:
+		OpenCallback(std::string password = std::string())
+			: _password(password)
+		{}
+
 		std::string request_password() const override
 		{
-			return std::string();
+			return _password;
 		}
+
+	private:
+		std::string _password;
 	};
 
-	class EmptyExtractCallback: public IExtractCallback {
+	class ExtractCallback: public IExtractCallback {
+	public:
+		ExtractCallback(std::string password = std::string())
+			: _password(password)
+		{}
+
 		std::string request_password() const override
 		{
-			return std::string();
+			return _password;
 		}
+
 		bool notify_progress(uint64_t, uint64_t) const override
 		{
 			return true;
 		}
+
+	private:
+		std::string _password;
 	};
 
 	class IFile {
@@ -167,7 +184,7 @@ namespace sevenzip {
 		bool is_file() const;
 		bool is_dir() const;
 
-		File extract(const IExtractCallback& callback = EmptyExtractCallback()) const;
+		File extract(const IExtractCallback& callback) const;
 
 		size_t get_props_count() const;
 

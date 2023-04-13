@@ -1,4 +1,4 @@
-﻿#include "string.hpp"
+#include "string.hpp"
 #include "exception.hpp"
 #include <cstring>
 #include <memory>
@@ -25,6 +25,24 @@ std::string utf8(const wchar_t* wstr)
 	CheckErrno(iconv(conv.get(), &in_ptr, &in_size, &res_ptr, &res_size) != static_cast<size_t>(-1), "iconv: ");
 
 	return std::string(result.get());
+}
+
+std::wstring wide_str(const char* str)
+{
+	auto conv = std::unique_ptr<void, decltype(&iconv_close)>(iconv_open("WCHAR_T", "UTF-8"), &iconv_close);
+	CheckErrno(conv.get() != reinterpret_cast<iconv_t>(-1), "iconv_open: ");
+
+	size_t in_size = std::strlen(str);
+
+	auto   in_ptr   = const_cast<char*>(str);
+	size_t buf_len  = in_size * 4;
+	size_t buf_size = buf_len * sizeof(wchar_t);
+	auto   buf      = std::unique_ptr<wchar_t>(new wchar_t[buf_size + 1]());
+	auto   buf_ptr  = (char*)buf.get();
+
+	CheckErrno(iconv(conv.get(), &in_ptr, &in_size, &buf_ptr, &buf_size) != static_cast<size_t>(-1), "iconv: ");
+
+	return std::wstring(buf.get());
 }
 
 std::string utf8(const char* str, const char* encoding)

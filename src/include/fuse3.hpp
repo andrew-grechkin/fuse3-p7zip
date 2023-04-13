@@ -1,4 +1,4 @@
-﻿#ifndef __FUSE3_7Z__FUSE3_HPP__
+#ifndef __FUSE3_7Z__FUSE3_HPP__
 #define __FUSE3_7Z__FUSE3_HPP__
 
 #define FUSE_USE_VERSION 35
@@ -19,6 +19,7 @@ public:
 
 	ssize_t            execute(sevenzip::IArchive* archive);
 	const std::string& path() const;
+	std::string        password() const;
 
 private:
 	class Params;

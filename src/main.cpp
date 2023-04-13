@@ -31,7 +31,7 @@ try {
 	}
 
 	log().printf("open archive: %s", loop.path().c_str());
-	auto arc = lib->open(loop.path(), sevenzip::EmptyOpenCallback());
+	auto arc = lib->open(loop.path(), sevenzip::OpenCallback(loop.password()));
 
 	return loop.execute(arc.get());
 } catch (std::exception& e) {

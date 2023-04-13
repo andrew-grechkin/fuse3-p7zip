@@ -1,4 +1,4 @@
-﻿#include "7zip-impl.hpp"
+#include "7zip-impl.hpp"
 #include "exception.hpp"
 #include "string.hpp"
 #include "logger.hpp"
@@ -103,10 +103,10 @@ namespace sevenzip {
 		return ret;
 	}
 
-	HRESULT WINAPI ImplArchive::CryptoGetTextPassword(BSTR* password)
+	HRESULT WINAPI ImplArchive::CryptoGetTextPassword(BSTR* pass)
 	{
-		// std::string ret = callback.request_password();
-		// com::BStr(ret).detach(*password);
+		LogDebug("%s %p", __PRETTY_FUNCTION__, pass);
+		*pass = SysAllocString(wide_str(callback.request_password().c_str()).c_str());
 		return S_OK;
 	}
 

@@ -6,8 +6,7 @@
 #include <cstring>
 
 namespace sevenzip {
-	struct Guid: public GUID {
-	};
+	struct Guid: public GUID {};
 
 	class ImplFormat: public IFormat {
 	public:
