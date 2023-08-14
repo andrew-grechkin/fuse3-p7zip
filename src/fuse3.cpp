@@ -70,9 +70,9 @@ Fuse::Params::Params(int argc, char** argv)
 	if (cmd_params.password) {
 		cmd_password = cmd_params.password;
 	} else if (cmd_params.passfile) {
-		std::ifstream passfile(cmd_params.passfile);
+		std::ifstream            passfile(cmd_params.passfile);
 		std::istreambuf_iterator it(passfile);
-		std::string pass(it, {});
+		std::string              pass(it, {});
 		cmd_password = pass;
 	} else {
 		auto password = std::getenv("FUSE3_P7ZIP_PASSWORD");

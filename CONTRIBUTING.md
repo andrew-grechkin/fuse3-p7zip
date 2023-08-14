@@ -17,8 +17,20 @@ Include files of p7zip library are provided by git submodule `3rdparty/p7zip`
 
 ## Build
 
+### Init 3rdparty submodule
+
+```
+$ make init
+```
+
 ### Debug version
 
 ```
-$ ./build
+$ make build
+```
+
+## Tidy
+
+```
+$ make tidy
 ```
