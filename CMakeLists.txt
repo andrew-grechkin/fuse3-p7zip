@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.12 FATAL_ERROR)
 
 project (fuse3-p7zip
-	VERSION 1.2.0
+	VERSION 1.2.1
 	DESCRIPTION "fuse3 file system that uses the p7zip library to mount archives"
 	LANGUAGES CXX
 )

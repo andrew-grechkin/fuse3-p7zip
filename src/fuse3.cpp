@@ -6,6 +6,7 @@
 #include "version.hpp"
 
 #include <cstring>
+#include <fstream>
 #include <filesystem>
 #include <map>
 #include <memory>
@@ -31,10 +32,14 @@ struct Cache {
 
 static struct cmd_params_t {
 	char*                    password = nullptr;
+	char*                    passfile = nullptr;
 	std::vector<std::string> cli_args;
 } cmd_params;
 
-static const fuse_opt opts_spec[] = {CMD_OPT("--password=%s", password), CMD_OPT("-p %s", password), FUSE_OPT_END};
+static const fuse_opt opts_spec[] = {CMD_OPT("--password=%s", password), CMD_OPT("-p %s", password),
+									 CMD_OPT("--passfile=%s", passfile), FUSE_OPT_END};
+
+static std::string cmd_password;
 
 class Fuse::Params: public fuse_cmdline_opts {
 public:
@@ -62,10 +67,17 @@ Fuse::Params::Params(int argc, char** argv)
 
 	CheckResult(fuse_parse_cmdline(&args, this) == 0, "fuse_parse_cmdline");
 
-	if (!cmd_params.password) {
+	if (cmd_params.password) {
+		cmd_password = cmd_params.password;
+	} else if (cmd_params.passfile) {
+		std::ifstream passfile(cmd_params.passfile);
+		std::istreambuf_iterator it(passfile);
+		std::string pass(it, {});
+		cmd_password = pass;
+	} else {
 		auto password = std::getenv("FUSE3_P7ZIP_PASSWORD");
 		if (password) {
-			cmd_params.password = password;
+			cmd_password = password;
 		}
 	}
 
@@ -90,6 +102,7 @@ void Fuse::Params::print_usage()
 	printf("usage: fuse3-7z [options] <archive> <mountpoint>\n\n");
 	printf("Options:\n");
 	printf("    -p <password>          provide password for protected archives\n");
+	printf("    --passfile <file>      provide file with password for protected archives\n");
 	fuse_cmdline_help();
 	fuse_lib_help(&args);
 	exit(0);
@@ -232,10 +245,7 @@ const std::string& Fuse::path() const
 
 std::string Fuse::password() const
 {
-	if (cmd_params.password) {
-		return std::string(cmd_params.password);
-	}
-	return std::string();
+	return cmd_password;
 }
 
 ssize_t Fuse::execute(sevenzip::IArchive* arc)
