@@ -41,7 +41,7 @@ encoding `cp866` will be enforced for listing archived files/directories.
 
 Provide a password which will be used if archive is protected with a password.
 
-* --passfile `</path/to/password/file>`
+* --passfile=`</path/to/password/file>`
 
 Provide a path to a file with a password which will be used if archive is protected with a password.
 

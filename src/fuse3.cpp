@@ -101,8 +101,9 @@ void Fuse::Params::print_usage()
 {
 	printf("usage: fuse3-7z [options] <archive> <mountpoint>\n\n");
 	printf("Options:\n");
-	printf("    -p <password>          provide password for protected archives\n");
-	printf("    --passfile <file>      provide file with password for protected archives\n");
+	printf("    -p <password>          provide a password for protected archives\n");
+	printf("    --password <password>  provide a password for protected archives\n");
+	printf("    --passfile <file>      provide a file with a password for protected archives\n");
 	fuse_cmdline_help();
 	fuse_lib_help(&args);
 	exit(0);
