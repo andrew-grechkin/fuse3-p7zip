@@ -8,7 +8,7 @@ fuse3 file system that uses the p7zip library to mount archives (read only)
 
 ## Synopsis
 
-```
+```bash
 $ fuse3-p7zip archive.7z /tmp/mnt
 $ ls -la /tmp/mnt
 $ fusermount -u /tmp/mnt
@@ -62,7 +62,7 @@ environment variable forces application to use alternative encoding to decode fi
 
 for example:
 
-```
+```bash
 $ fuse3-p7zip cyrillic-created-on-windows.zip /tmp/mnt
 $ ls /tmp/mnt
 ''$'\302\217''à¨¢¥â.txt'
@@ -77,9 +77,9 @@ $ ls /tmp/mnt
 * FUSE3_P7ZIP_MAX_OPEN_SIZE
 
 The nature of 7z API does not allow to have random access to the content of a file in archive. This means that each
-file should be extracted to a temporary folder on access. If this file is too big (for example it's partition in an
+file should be extracted to a temporary directory on access. If this file is too big (for example it's partition in an
 .img file - application will extract the whole partition to /tmp. Most of the time on modern Linux it's a RAM based
-folder). To prevent this situation you can set this environment variable to a maximum allowed file size in bytes.
+directory). To prevent this situation you can set this environment variable to a maximum allowed file size in bytes.
 Attempts openining any file in archive bigger than this will end up in E2BIG error.
 
 * FUSE3_P7ZIP_FORMATS
@@ -89,7 +89,7 @@ with a format later in the list. This environment variable allows to override fo
 
 for example (try open .iso file with Iso or Udf formats first and only fallback on APM and GPT formats)
 
-```
+```bash
 FUSE3_P7ZIP_FORMATS="Iso:Udf:*:APM:GPT" fuse3-p7zip ubuntu-20.04-desktop-amd64.iso /tmp/mnt
 ```
 
@@ -99,7 +99,7 @@ To check the list of all available formats run `7z i` command
 
 ### vifm config snippet (mount 7zip supported archive with fuse3-p7zip in vifm)
 
-> I suggest to use [archivemount](https://github.com/cybernoid/archivemount) for all tar-based archives as priority and
+> I suggest to use [archivemount](https://github.com/cybernoid/archivemount) for all tar-based archives as a priority and
 > only fallback to p7zip for such archives
 
 ```vim
