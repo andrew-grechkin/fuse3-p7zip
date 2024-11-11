@@ -12,10 +12,7 @@
 #include <memory>
 #include <vector>
 
-#define CMD_OPT(t, m)                                                                                                  \
-	{                                                                                                                  \
-		t, offsetof(struct cmd_params_t, m), 1                                                                         \
-	}
+#define CMD_OPT(t, m) {t, offsetof(struct cmd_params_t, m), 1}
 
 enum arg_status : int {
 	ARG_DISCARD = 0,
@@ -34,6 +31,7 @@ static struct cmd_params_t {
 	char*                    password = nullptr;
 	char*                    passfile = nullptr;
 	std::vector<std::string> cli_args;
+	bool                     allow_other = false;
 } cmd_params;
 
 static const fuse_opt opts_spec[] = {CMD_OPT("--password=%s", password), CMD_OPT("-p %s", password),
@@ -111,8 +109,13 @@ void Fuse::Params::print_usage()
 
 int Fuse::Params::process_arg(Fuse::Params* fuse, const char* arg, int key, struct fuse_args* outargs)
 {
-	// printf("key: %d, arg: %s\n", key, arg);
+	LogDebug("key: %d, arg: %s\n", key, arg);
 	switch (key) {
+		case FUSE_OPT_KEY_OPT:
+			if (strcmp("allow_other", arg) == 0) {
+				cmd_params.allow_other = true;
+				return ARG_DISCARD;
+			}
 		case FUSE_OPT_KEY_NONOPT:
 			cmd_params.cli_args.emplace_back(arg);
 			if (cmd_params.cli_args.back().empty()) fuse->print_usage();
@@ -254,7 +257,10 @@ ssize_t Fuse::execute(sevenzip::IArchive* arc)
 	static auto cache     = Cache{arc, sevenzip::ExtractCallback(password()), Cache::FileTree()};
 	auto        root      = sevenzip::Path("/");
 	auto        root_stat = arc->stat();
-	root_stat.st_mode     = (root_stat.st_mode & ~S_IFMT) | S_IFDIR;
+
+	root_stat.st_mode = (root_stat.st_mode & ~S_IFMT) | S_IFDIR | S_IXUSR | S_IXGRP;
+	if (cmd_params.allow_other) root_stat.st_mode |= S_IROTH | S_IXOTH;
+
 	cache.tree.emplace(root, std::make_pair(arc->end(), root_stat));
 	for (auto it = arc->begin(); it != arc->end(); ++it) {
 		//log().printf("it: '%s'\n", it.path().c_str());
