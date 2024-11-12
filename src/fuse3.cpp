@@ -114,7 +114,7 @@ int Fuse::Params::process_arg(Fuse::Params* fuse, const char* arg, int key, stru
 		case FUSE_OPT_KEY_OPT:
 			if (strcmp("allow_other", arg) == 0) {
 				cmd_params.allow_other = true;
-				return ARG_DISCARD;
+				return ARG_KEEP;
 			}
 		case FUSE_OPT_KEY_NONOPT:
 			cmd_params.cli_args.emplace_back(arg);
