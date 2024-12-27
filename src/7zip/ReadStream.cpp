@@ -1,4 +1,4 @@
-﻿#include "7zip-impl.hpp"
+#include "7zip-impl.hpp"
 #include "exception.hpp"
 
 namespace sevenzip {
@@ -58,14 +58,14 @@ namespace sevenzip {
 		lstat(_path.c_str(), &_stat);
 	}
 
-	HRESULT WINAPI FileReadStream::Read(void* data, UInt32 size, UInt32* processedSize)
+	HRESULT WINAPI FileReadStream::Read(void* data, UInt32 size, UInt32* processedSize) noexcept
 	{
 		auto read = std::fread(data, 1, size, _file);
 		if (processedSize) *processedSize = read;
 		return check_error(_file);
 	}
 
-	HRESULT WINAPI FileReadStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition)
+	HRESULT WINAPI FileReadStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition) noexcept
 	{
 		if (std::fseek(_file, offset, seekOrigin) == 0) {
 			if (newPosition) *newPosition = std::ftell(_file);

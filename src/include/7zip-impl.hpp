@@ -7,7 +7,7 @@
 #include "library-impl.hpp"
 
 #define ENV_HAVE_WCTYPE_H
-#include "CPP/myWindows/StdAfx.h"
+#include "CPP/Common/Common.h"
 #include "CPP/Windows/Defs.h"
 #include "CPP/7zip/MyVersion.h"
 #include "CPP/7zip/Archive/IArchive.h"
@@ -36,10 +36,10 @@ namespace sevenzip {
 		HRESULT WINAPI QueryInterface(REFIID riid, void** object) override;
 
 		// ISequentialInStream
-		HRESULT WINAPI Read(void* data, UInt32 size, UInt32* processedSize) override;
+		HRESULT WINAPI Read(void* data, UInt32 size, UInt32* processedSize) noexcept override;
 
 		// IInStream
-		HRESULT WINAPI Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition) override;
+		HRESULT WINAPI Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition) noexcept override;
 
 	private:
 		Path        _path;
@@ -63,11 +63,11 @@ namespace sevenzip {
 		HRESULT WINAPI QueryInterface(REFIID riid, void** object) override;
 
 		// ISequentialOutStream
-		HRESULT WINAPI Write(const void* data, UInt32 size, UInt32* processedSize) override;
+		HRESULT WINAPI Write(const void* data, UInt32 size, UInt32* processedSize) noexcept override;
 
 		// IOutStream
-		HRESULT WINAPI Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition) override;
-		HRESULT WINAPI SetSize(UInt64 newSize) override;
+		HRESULT WINAPI Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition) noexcept override;
+		HRESULT WINAPI SetSize(UInt64 newSize) noexcept override;
 
 		// IFile
 		uint64_t read(void* data, uint64_t size) override;
@@ -127,11 +127,11 @@ namespace sevenzip {
 		HRESULT WINAPI QueryInterface(REFIID riid, void** object) override;
 
 		// IArchiveOpenCallback
-		HRESULT WINAPI SetTotal(const UInt64* files, const UInt64* bytes) override;
-		HRESULT WINAPI SetCompleted(const UInt64* files, const UInt64* bytes) override;
+		HRESULT WINAPI SetTotal(const UInt64* files, const UInt64* bytes) noexcept override;
+		HRESULT WINAPI SetCompleted(const UInt64* files, const UInt64* bytes) noexcept override;
 
 		// ICryptoGetTextPassword
-		HRESULT WINAPI CryptoGetTextPassword(BSTR* password) override;
+		HRESULT WINAPI CryptoGetTextPassword(BSTR* password) noexcept override;
 
 		const Path&   path() const noexcept override;
 		const Stat&   stat() const noexcept override;
@@ -147,7 +147,7 @@ namespace sevenzip {
 		const_iterator at(size_t index) const override;
 
 		com::Object<IInArchive> operator->() const;
-								operator com::Object<IInArchive>() const;
+		operator com::Object<IInArchive>() const;
 
 	protected:
 		void open_archive(const ImplLib& lib);
@@ -194,16 +194,17 @@ namespace sevenzip {
 		HRESULT WINAPI QueryInterface(REFIID riid, void** object) override;
 
 		// IProgress
-		HRESULT WINAPI SetTotal(UInt64 size) override;
-		HRESULT WINAPI SetCompleted(const UInt64* completeValue) override;
+		HRESULT WINAPI SetTotal(UInt64 size) noexcept override;
+		HRESULT WINAPI SetCompleted(const UInt64* completeValue) noexcept override;
 
 		// IArchiveExtractCallback
-		HRESULT WINAPI GetStream(UInt32 index, ISequentialOutStream** outStream, Int32 askExtractMode) override;
-		HRESULT WINAPI PrepareOperation(Int32 askExtractMode) override;
-		HRESULT WINAPI SetOperationResult(Int32 resultEOperationResult) override;
+		HRESULT WINAPI GetStream(UInt32 index, ISequentialOutStream** outStream,
+								 Int32 askExtractMode) noexcept override;
+		HRESULT WINAPI PrepareOperation(Int32 askExtractMode) noexcept override;
+		HRESULT WINAPI SetOperationResult(Int32 resultEOperationResult) noexcept override;
 
 		// ICryptoGetTextPassword
-		HRESULT WINAPI CryptoGetTextPassword(BSTR* pass) override;
+		HRESULT WINAPI CryptoGetTextPassword(BSTR* pass) noexcept override;
 
 		// IArchiveExtractor
 		void execute(bool test) override;

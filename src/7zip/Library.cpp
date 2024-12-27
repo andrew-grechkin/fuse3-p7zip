@@ -1,8 +1,8 @@
-﻿#ifndef INITGUID
+#ifndef INITGUID
 #	define INITGUID
 #endif
 
-#include "CPP/myWindows/StdAfx.h"
+#include "CPP/Common/Common.h"
 #include "CPP/Windows/Defs.h"
 #include "CPP/7zip/MyVersion.h"
 
