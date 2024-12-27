@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+std::string chomp(const std::string& str);
+
 std::string utf8raw(const std::wstring& wstr, const char* encoding);
 
 std::string utf8(const wchar_t* str);
