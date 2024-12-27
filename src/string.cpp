@@ -4,6 +4,15 @@
 #include <memory>
 #include <iconv.h>
 
+std::string chomp(const std::string& str)
+{
+	auto pos = str.find_last_not_of("\n");
+	if (pos != std::string::npos) {
+		return str.substr(0, pos + 1);
+	}
+	return str;
+}
+
 std::string utf8raw(const std::wstring& wstr, const char* encoding)
 {
 	return utf8(std::string(wstr.begin(), wstr.end()).c_str(), encoding);

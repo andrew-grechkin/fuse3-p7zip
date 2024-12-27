@@ -5,6 +5,7 @@
 #include "string.hpp"
 #include "version.hpp"
 
+#include <array>
 #include <cstring>
 #include <fstream>
 #include <filesystem>
@@ -37,7 +38,71 @@ static struct cmd_params_t {
 static const fuse_opt opts_spec[] = {CMD_OPT("--password=%s", password), CMD_OPT("-p %s", password),
 									 CMD_OPT("--passfile=%s", passfile), FUSE_OPT_END};
 
-static std::string cmd_password;
+class IPassword {
+public:
+	virtual ~IPassword() noexcept = default;
+
+	virtual std::string get() noexcept = 0;
+};
+
+class PasswordFromString: public IPassword {
+public:
+	PasswordFromString(const std::string& password) noexcept
+		: _password(password)
+	{}
+	std::string get() noexcept
+	{
+		return _password;
+	}
+
+private:
+	std::string _password;
+};
+
+class PasswordFromFile: public IPassword {
+public:
+	PasswordFromFile(const std::filesystem::path& path, const std::filesystem::path& arc) noexcept
+		: _archive(arc)
+		, _path(path)
+	{}
+	std::string get() noexcept
+	{
+		if (_password.empty()) {
+			if (access(_path.c_str(), X_OK) == 0) {
+				_password = chomp(exec(_path));
+			} else {
+				std::ifstream            passfile(_path);
+				std::istreambuf_iterator it(passfile);
+				std::string              pass(it, {});
+				_password = chomp(pass);
+			}
+		}
+		return _password;
+	}
+
+private:
+	std::string exec(const std::filesystem::path& path)
+	{
+		std::array<char, 1024>                buffer;
+		std::string                           result;
+		auto                                  cmd = std::string(path.c_str()) + " '" + _archive.c_str() + "'";
+		std::unique_ptr<FILE, int (*)(FILE*)> pipe(popen(cmd.c_str(), "r"), pclose);
+		if (!pipe) {
+			throw std::runtime_error("popen() failed!");
+		}
+		while (fgets(buffer.data(), static_cast<int>(buffer.size()), pipe.get()) != nullptr) {
+			result += buffer.data();
+		}
+
+		return result;
+	}
+
+	std::filesystem::path _archive;
+	std::filesystem::path _path;
+	std::string           _password;
+};
+
+static std::unique_ptr<IPassword> cmd_password = std::make_unique<PasswordFromString>(std::string());
 
 class Fuse::Params: public fuse_cmdline_opts {
 public:
@@ -65,20 +130,6 @@ Fuse::Params::Params(int argc, char** argv)
 
 	CheckResult(fuse_parse_cmdline(&args, this) == 0, "fuse_parse_cmdline");
 
-	if (cmd_params.password) {
-		cmd_password = cmd_params.password;
-	} else if (cmd_params.passfile) {
-		std::ifstream            passfile(cmd_params.passfile);
-		std::istreambuf_iterator it(passfile);
-		std::string              pass(it, {});
-		cmd_password = pass;
-	} else {
-		auto password = std::getenv("FUSE3_P7ZIP_PASSWORD");
-		if (password) {
-			cmd_password = password;
-		}
-	}
-
 	if (show_version) {
 		printf("%s\n", PROJECT_VERSION);
 		// printf("FUSE library version %s\n", fuse_pkgversion());
@@ -92,6 +143,31 @@ Fuse::Params::Params(int argc, char** argv)
 	} else if (!mountpoint) {
 		fprintf(stderr, "error: no mountpoint specified\n");
 		exit(0);
+	}
+
+	auto env_password = std::getenv("FUSE3_P7ZIP_PASSWORD");
+	if (env_password) {
+		LogDebug("using FUSE3_P7ZIP_PASSWORD\n");
+		cmd_password.reset(new PasswordFromString(env_password));
+	}
+
+	if (cmd_params.password) {
+		LogDebug("using --password\n");
+		cmd_password.reset(new PasswordFromString(cmd_params.password));
+	}
+
+	auto env_passfile = std::getenv("FUSE3_P7ZIP_PASSFILE");
+	if (env_passfile && std::filesystem::exists(env_passfile) && std::filesystem::is_regular_file(env_passfile)) {
+		auto path = std::filesystem::absolute(std::filesystem::path(env_passfile));
+		LogDebug("using FUSE3_P7ZIP_PASSFILE: %s\n", path.c_str());
+		cmd_password.reset(new PasswordFromFile(path, cmd_params.cli_args[0]));
+	}
+
+	if (cmd_params.passfile && std::filesystem::exists(cmd_params.passfile) &&
+		std::filesystem::is_regular_file(cmd_params.passfile)) {
+		auto path = std::filesystem::absolute(std::filesystem::path(cmd_params.passfile));
+		LogDebug("using --passfile: %s\n", path.c_str());
+		cmd_password.reset(new PasswordFromFile(path, cmd_params.cli_args[0]));
 	}
 }
 
@@ -249,7 +325,7 @@ const std::string& Fuse::path() const
 
 std::string Fuse::password() const
 {
-	return cmd_password;
+	return cmd_password->get();
 }
 
 ssize_t Fuse::execute(sevenzip::IArchive* arc)

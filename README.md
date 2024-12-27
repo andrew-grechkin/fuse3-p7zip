@@ -55,6 +55,13 @@ Change where application searches for 7z.so library. By default this is `/usr/li
 
 Provide a password which will be used if archive is protected with a password.
 
+* FUSE3_P7ZIP_PASSFILE
+
+Provide a password file which will be used if archive is protected with a password.
+
+	If executable file is provided then its output to /dev/stdout will be used as a password.
+	If non-executable file is provided then its content will be used as a password.
+
 * FUSE3_P7ZIP_FORCE_ENCODING
 
 Some archives (especially those ones created on windows) have file names encoded in non Unicode encoding. This
@@ -96,6 +103,23 @@ FUSE3_P7ZIP_FORMATS="Iso:Udf:*:APM:GPT" fuse3-p7zip ubuntu-20.04-desktop-amd64.i
 To check the list of all available formats run `7z i` command
 
 ## Examples
+
+### password protected archive, request password interactively (KDE password popup window)
+
+```bash
+$ fuse3-p7zip example/archive.7z /tmp/mnt --passfile=example/password-kde
+```
+
+```bash
+$ export FUSE3_P7ZIP_PASSFILE=example/password-kde
+$ fuse3-p7zip example/archive.7z /tmp/mnt
+```
+
+### password protected archive, fetch password from a password storage
+
+```bash
+$ fuse3-p7zip example/archive.7z /tmp/mnt --passfile=example/password-pass
+```
 
 ### vifm config snippet (mount 7zip supported archive with fuse3-p7zip in vifm)
 
