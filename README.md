@@ -4,7 +4,7 @@
 
 ## Abstract
 
-fuse3 file system that uses the p7zip library to mount archives (read only)
+fuse3 file system that uses the 7zip library to mount archives (read only)
 
 ## Synopsis
 
@@ -25,7 +25,7 @@ mount any archive supported by 7zip as a filesystem mountpoint and have read onl
 
 * Linux
 * fuse3
-* p7zip
+* 7zip
 
 ## Enforcing codepage by renaming archive
 
@@ -49,7 +49,7 @@ Provide a path to a file with a password which will be used if archive is protec
 
 * FUSE3_P7ZIP_LIBRARY
 
-Change where application searches for 7z.so library. By default this is `/usr/lib/p7zip/7z.so`
+Change where application searches for 7z.so library. By default this is `/usr/lib/7zip/7z.so`
 
 * FUSE3_P7ZIP_PASSWORD
 

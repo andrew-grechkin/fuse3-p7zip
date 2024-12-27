@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 3.12 FATAL_ERROR)
 
 project (fuse3-p7zip
-	VERSION 1.2.3
-	DESCRIPTION "fuse3 file system that uses the p7zip library to mount archives"
+	VERSION 2.0.0
+	DESCRIPTION "fuse3 file system that uses the 7zip library to mount archives"
 	LANGUAGES CXX
 )
 
@@ -53,8 +53,8 @@ add_executable             ("${PROJECT_NAME}"
 	src/7zip/ReadStream.cpp
 	src/7zip/WriteStream.cpp
 	src/7zip/com.cpp
-	3rdparty/p7zip/CPP/Common/MyWindows.cpp
-	3rdparty/p7zip/CPP/Windows/PropVariant.cpp
+	3rdparty/7zip/CPP/Common/MyWindows.cpp
+	3rdparty/7zip/CPP/Windows/PropVariant.cpp
 )
 
 if ("${CMAKE_BUILD_TYPE}" MATCHES "Release")
@@ -81,10 +81,10 @@ target_include_directories ("${PROJECT_NAME}" PRIVATE
 target_include_directories ("${PROJECT_NAME}" PRIVATE
 	src/include
 	"${FUSE3_INCLUDE_DIR}"
-	"${CMAKE_CURRENT_LIST_DIR}/3rdparty/p7zip"
-	"${CMAKE_CURRENT_LIST_DIR}/3rdparty/p7zip/CPP"
-	"${CMAKE_CURRENT_LIST_DIR}/3rdparty/p7zip/CPP/include_windows"
-	"${CMAKE_CURRENT_LIST_DIR}/3rdparty/p7zip/CPP/myWindows"
+	"${CMAKE_CURRENT_LIST_DIR}/3rdparty/7zip"
+	"${CMAKE_CURRENT_LIST_DIR}/3rdparty/7zip/CPP"
+	"${CMAKE_CURRENT_LIST_DIR}/3rdparty/7zip/CPP/include_windows"
+	"${CMAKE_CURRENT_LIST_DIR}/3rdparty/7zip/CPP/myWindows"
 )
 target_link_libraries      ("${PROJECT_NAME}" PRIVATE
 	"${CMAKE_DL_LIBS}"

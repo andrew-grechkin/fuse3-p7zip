@@ -42,7 +42,7 @@ namespace sevenzip {
 		, total()
 	{}
 
-	HRESULT WINAPI ImplArchiveExtractor::SetTotal(UInt64 size)
+	HRESULT WINAPI ImplArchiveExtractor::SetTotal(UInt64 size) noexcept
 	{
 		LogDebug("%s: %d", __PRETTY_FUNCTION__, size);
 		total       = size;
@@ -51,7 +51,7 @@ namespace sevenzip {
 		return ret;
 	}
 
-	HRESULT WINAPI ImplArchiveExtractor::SetCompleted(const UInt64* completeValue)
+	HRESULT WINAPI ImplArchiveExtractor::SetCompleted(const UInt64* completeValue) noexcept
 	{
 		LogDebug("%s: %p %llu", __PRETTY_FUNCTION__, completeValue, *completeValue);
 		HRESULT ret = S_OK;
@@ -61,7 +61,8 @@ namespace sevenzip {
 		return ret;
 	}
 
-	HRESULT WINAPI ImplArchiveExtractor::GetStream(UInt32 index, ISequentialOutStream** outStream, Int32 askExtractMode)
+	HRESULT WINAPI ImplArchiveExtractor::GetStream(UInt32 index, ISequentialOutStream** outStream,
+												   Int32 askExtractMode) noexcept
 	{
 		LogDebug("%s: %d %d %p", __PRETTY_FUNCTION__, index, askExtractMode, file.get());
 		*outStream = nullptr;
@@ -99,7 +100,7 @@ namespace sevenzip {
 		return S_OK;
 	}
 
-	HRESULT WINAPI ImplArchiveExtractor::PrepareOperation(Int32 askExtractMode)
+	HRESULT WINAPI ImplArchiveExtractor::PrepareOperation(Int32 askExtractMode) noexcept
 	{
 		LogDebug("%s: %d", __PRETTY_FUNCTION__, askExtractMode);
 		switch (askExtractMode) {
@@ -110,7 +111,7 @@ namespace sevenzip {
 		return S_OK;
 	}
 
-	HRESULT WINAPI ImplArchiveExtractor::SetOperationResult(Int32 operationResult)
+	HRESULT WINAPI ImplArchiveExtractor::SetOperationResult(Int32 operationResult) noexcept
 	{
 		LogDebug("%s: %d", __PRETTY_FUNCTION__, operationResult);
 		if (operationResult != NArchive::NExtract::NOperationResult::kOK) {
@@ -127,7 +128,7 @@ namespace sevenzip {
 		return S_OK;
 	}
 
-	HRESULT WINAPI ImplArchiveExtractor::CryptoGetTextPassword(BSTR* pass)
+	HRESULT WINAPI ImplArchiveExtractor::CryptoGetTextPassword(BSTR* pass) noexcept
 	{
 		LogDebug("%s %p", __PRETTY_FUNCTION__, pass);
 		*pass = SysAllocString(wide_str(callback.request_password().c_str()).c_str());

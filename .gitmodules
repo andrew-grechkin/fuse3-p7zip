@@ -1,3 +1,3 @@
-[submodule "3rdparty/p7zip"]
-	path = 3rdparty/p7zip
-	url = https://github.com/btolab/p7zip.git
+[submodule "3rdparty/7zip"]
+	path = 3rdparty/7zip
+	url = https://github.com/ip7z/7zip.git

@@ -3,7 +3,7 @@
 
 #include <atomic>
 
-#include "CPP/myWindows/StdAfx.h"
+#include "CPP/Common/Common.h"
 
 namespace com {
 	HRESULT ConvertErrorToHRESULT(LONG error);

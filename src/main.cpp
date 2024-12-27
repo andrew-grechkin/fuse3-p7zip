@@ -8,7 +8,7 @@
 int main(int argc, char** argv, char** env)
 try {
 	auto override_library = std::getenv("FUSE3_P7ZIP_LIBRARY");
-	auto lib_path         = sevenzip::Path(override_library ? override_library : "/usr/lib/p7zip/7z.so");
+	auto lib_path         = sevenzip::Path(override_library ? override_library : "/usr/lib/7zip/7z.so");
 
 	// preload Rar codecs (this also can be done with LD_PRELOAD)
 	library::Dynamic rar_codec;

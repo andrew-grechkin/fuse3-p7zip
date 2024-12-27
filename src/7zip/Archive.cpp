@@ -85,7 +85,7 @@ namespace sevenzip {
 		return ret;
 	}
 
-	HRESULT WINAPI ImplArchive::SetTotal(const UInt64* files, const UInt64* bytes)
+	HRESULT WINAPI ImplArchive::SetTotal(const UInt64* files, const UInt64* bytes) noexcept
 	{
 		UNUSED(files);
 		UNUSED(bytes);
@@ -94,7 +94,7 @@ namespace sevenzip {
 		return ret;
 	}
 
-	HRESULT WINAPI ImplArchive::SetCompleted(const UInt64* files, const UInt64* bytes)
+	HRESULT WINAPI ImplArchive::SetCompleted(const UInt64* files, const UInt64* bytes) noexcept
 	{
 		UNUSED(files);
 		UNUSED(bytes);
@@ -103,7 +103,7 @@ namespace sevenzip {
 		return ret;
 	}
 
-	HRESULT WINAPI ImplArchive::CryptoGetTextPassword(BSTR* pass)
+	HRESULT WINAPI ImplArchive::CryptoGetTextPassword(BSTR* pass) noexcept
 	{
 		LogDebug("%s %p", __PRETTY_FUNCTION__, pass);
 		*pass = SysAllocString(wide_str(callback.request_password().c_str()).c_str());
@@ -236,7 +236,7 @@ namespace sevenzip {
 	ImplArchive::ci_iterator ImplArchive::ci_iterator::operator++(int)
 	{
 		ci_iterator ret(*this);
-					operator++();
+		operator++();
 		return ret;
 	}
 

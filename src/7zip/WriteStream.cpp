@@ -1,4 +1,4 @@
-﻿#include "7zip-impl.hpp"
+#include "7zip-impl.hpp"
 #include "exception.hpp"
 #include "logger.hpp"
 
@@ -59,7 +59,7 @@ namespace sevenzip {
 		return ret;
 	}
 
-	HRESULT WINAPI FileWriteStream::Write(const void* data, UInt32 size, UInt32* processedSize)
+	HRESULT WINAPI FileWriteStream::Write(const void* data, UInt32 size, UInt32* processedSize) noexcept
 	{
 		LogTrace();
 		DWORD written = std::fwrite(data, 1, size, _file);
@@ -68,7 +68,7 @@ namespace sevenzip {
 		return check_error(_file);
 	}
 
-	HRESULT WINAPI FileWriteStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition)
+	HRESULT WINAPI FileWriteStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition) noexcept
 	{
 		LogTrace();
 		std::fseek(_file, offset, seekOrigin);
@@ -78,7 +78,7 @@ namespace sevenzip {
 		return check_error(_file);
 	}
 
-	HRESULT WINAPI FileWriteStream::SetSize(UInt64 newSize)
+	HRESULT WINAPI FileWriteStream::SetSize(UInt64 newSize) noexcept
 	{
 		LogTrace();
 		auto pos = std::ftell(_file);

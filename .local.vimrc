@@ -5,9 +5,9 @@ if !exists("g:ale_configs_updated")
 		\"-I /usr/include/fuse3",
 		\"-I ".s:root."/include",
 		\"-I ".s:root."/src/include",
-		\"-I ".s:root."/3rdparty/p7zip",
-		\"-I ".s:root."/3rdparty/p7zip/CPP",
-		\"-I ".s:root."/3rdparty/p7zip/CPP/include_windows",
+		\"-I ".s:root."/3rdparty/7zip",
+		\"-I ".s:root."/3rdparty/7zip/CPP",
+		\"-I ".s:root."/3rdparty/7zip/CPP/include_windows",
 		\"-I ".s:root."/src/7zip/include",
 		\"-D_FILE_OFFSET_BITS=64"
 	\]
