@@ -7,8 +7,9 @@
 
 #include <array>
 #include <cstring>
-#include <fstream>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <vector>
@@ -59,6 +60,23 @@ private:
 	std::string _password;
 };
 
+class PasswordFromStdin: public IPassword {
+public:
+	PasswordFromStdin() noexcept
+	{
+		LogDebug("reading password from STDIN\n");
+		std::string pass((std::istreambuf_iterator<char>(std::cin)), std::istreambuf_iterator<char>());
+		_password = chomp(pass);
+	}
+	std::string get() noexcept
+	{
+		return _password;
+	}
+
+private:
+	std::string _password;
+};
+
 class PasswordFromFile: public IPassword {
 public:
 	PasswordFromFile(const std::filesystem::path& path, const std::filesystem::path& arc) noexcept
@@ -69,8 +87,10 @@ public:
 	{
 		if (_password.empty()) {
 			if (access(_path.c_str(), X_OK) == 0) {
+				LogDebug("reading password as STDOUT of an executable\n");
 				_password = chomp(exec(_path));
 			} else {
+				LogDebug("reading password from file\n");
 				std::ifstream            passfile(_path);
 				std::istreambuf_iterator it(passfile);
 				std::string              pass(it, {});
@@ -145,28 +165,37 @@ Fuse::Params::Params(int argc, char** argv)
 		exit(0);
 	}
 
+	if (cmd_params.password) {
+		LogDebug("using --password\n");
+		cmd_password.reset(new PasswordFromString(cmd_params.password));
+		return;
+	}
+
+	if (cmd_params.passfile) {
+		if (cmd_params.passfile == std::string("-")) {
+			cmd_password.reset(new PasswordFromStdin());
+			return;
+		}
+
+		if (std::filesystem::exists(cmd_params.passfile) && std::filesystem::is_regular_file(cmd_params.passfile)) {
+			auto path = std::filesystem::absolute(std::filesystem::path(cmd_params.passfile));
+			LogDebug("using --passfile: %s\n", path.c_str());
+			cmd_password.reset(new PasswordFromFile(path, cmd_params.cli_args[0]));
+			return;
+		}
+	}
+
 	auto env_password = std::getenv("FUSE3_P7ZIP_PASSWORD");
 	if (env_password) {
 		LogDebug("using FUSE3_P7ZIP_PASSWORD\n");
 		cmd_password.reset(new PasswordFromString(env_password));
-	}
-
-	if (cmd_params.password) {
-		LogDebug("using --password\n");
-		cmd_password.reset(new PasswordFromString(cmd_params.password));
+		return;
 	}
 
 	auto env_passfile = std::getenv("FUSE3_P7ZIP_PASSFILE");
 	if (env_passfile && std::filesystem::exists(env_passfile) && std::filesystem::is_regular_file(env_passfile)) {
 		auto path = std::filesystem::absolute(std::filesystem::path(env_passfile));
 		LogDebug("using FUSE3_P7ZIP_PASSFILE: %s\n", path.c_str());
-		cmd_password.reset(new PasswordFromFile(path, cmd_params.cli_args[0]));
-	}
-
-	if (cmd_params.passfile && std::filesystem::exists(cmd_params.passfile) &&
-		std::filesystem::is_regular_file(cmd_params.passfile)) {
-		auto path = std::filesystem::absolute(std::filesystem::path(cmd_params.passfile));
-		LogDebug("using --passfile: %s\n", path.c_str());
 		cmd_password.reset(new PasswordFromFile(path, cmd_params.cli_args[0]));
 	}
 }

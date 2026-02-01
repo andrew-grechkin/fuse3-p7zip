@@ -43,7 +43,11 @@ Provide a password which will be used if archive is protected with a password.
 
 * --passfile=`</path/to/password/file>`
 
-Provide a path to a file with a password which will be used if archive is protected with a password.
+Provide a path to a file with a password (or an executable printing password) which will be used if archive is
+protected with a password.
+
+**WARNING**: be cautious if you pass executable as a passfile - it will be executed and STDOUT is used as password,
+don't pass any unknown executables.
 
 ### Environment variables
 
@@ -104,6 +108,12 @@ To check the list of all available formats run `7z i` command
 
 ## Examples
 
+### password protected archive, read password from STDIN
+
+```bash
+$ echo SECRET | fuse3-p7zip example/archive.7z /tmp/mnt --passfile=-
+```
+
 ### password protected archive, request password interactively (KDE password popup window)
 
 ```bash
@@ -124,26 +134,21 @@ $ fuse3-p7zip example/archive.7z /tmp/mnt --passfile=example/password-pass
 ### vifm config snippet (mount 7zip supported archive with fuse3-p7zip in vifm)
 
 > I suggest to use [archivemount](https://github.com/cybernoid/archivemount) for all tar-based archives as a priority and
-> only fallback to p7zip for such archives
+> only fallback to 7zip for such archives because 7zip works much worse with tar.
 
 ```vim
-filetype *.tar,
-	\*.tar.bz2,*.tbz2,*.tbz,*.tz2,*.tar.gz,*.tgz,*.taz,*.tar.lz,*.tlzip,*.tar.lzma,*.tlzma,*.tlz,
-	\*.tar.lzop,*.tlzo,*.tlzop,*.tar.xz,*.txz,*.tar.zst,*.tzst,*.tar.Z,*.taZ,
-	\*.bz2,*.gz,*.lz,*.lzma,*.lzop,*.xz,*.zst,*.Z,
-	\*.jar,*.war,*.ear,*.oxt,*.apkg,*.lha,*.ar,*.cpio,*.rpm,*.deb,*.udeb,*.mtree,*.xar,
-	\ {Mount with archivemount}
-	\ FUSE_MOUNT|archivemount %SOURCE_FILE %DESTINATION_DIR,
-filetype *.7z,
-	\*.dsl.dz,*.tar,*.a,*.so,lib*.so.*,*.zip,*.ova,*.sfs,
-	\*.apk,*.apm,*.ar,*.arj,*.cab,*.chm,*.cpio,*.cramfs,*.deb,*.dll,*.dmg,*.doc,*.esd,*.exe,
-	\*.flv,*.hxs,*.img,*.iso,*.iso,*.jar,*.lib,*.macho,*.msi,*.msp,*.nsis,*.pkg,*.pmd,*.ppt,
-	\*.qcow,*.qcow2,*.qcow2c,*.r00,*.rar,*.raw,*.rpm,*.squashfs,*.swf,*.swm,*.sys,*.vdi,*.vhd,*.vmdk,*.wim,*.xar,*.xls,
-	\*.tar.bz2,*.tbz2,*.tbz,*.tz2,*.tar.gz,*.tgz,*.taz,*.tar.lz,*.tlzip,*.tar.lzma,*.tlzma,*.tlz,
-	\*.tar.lzop,*.tlzo,*.tlzop,*.tar.xz,*.txz,*.tar.zst,*.tzst,*.tar.Z,*.taZ,
-	\*.bz2,*.gz,*.lz,*.lzma,*.lzop,*.xz,*.zst,*.Z
-	\ {Mount with fuse3-p7zip}
-	\ FUSE_MOUNT|fuse3-p7zip %SOURCE_FILE %DESTINATION_DIR,
+filetype <application/x-tar,application/x-*compressed-tar,application/vnd.efi.img>,
+    \<application/x-cpio*,application/x-rpm>
+    \ {Archive mount with archivemount}
+    \ FUSE_MOUNT|archivemount %SOURCE_FILE %DESTINATION_DIR,
+
+filetype <application/x-tar,application/x-*compressed-tar,application/vnd.efi.img>,
+    \<application/x-cpio*,application/x-rpm>,
+    \<application/epub+zip,application/vnd.rar,application/x-7z-compressed,application/java-archive,application/zip>,
+    \<application/x-zip-compressed-fb2>,<application/vnd.ms-cab-compressed>,<application/x-windows-themepack>,
+    \<application/vnd.debian.binary-package>
+    \ {Archive mount with fuse3-p7zip}
+    \ FUSE_MOUNT|fuse3-p7zip %SOURCE_FILE %DESTINATION_DIR,
 ```
 
 ## Author
