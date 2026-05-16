@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "7zip-impl.hpp"
 #include "exception.hpp"
 #include "logger.hpp"

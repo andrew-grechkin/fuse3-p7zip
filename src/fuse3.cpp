@@ -13,6 +13,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <unistd.h>
 
 #define CMD_OPT(t, m) {t, offsetof(struct cmd_params_t, m), 1}
 
